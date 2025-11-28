@@ -1,8 +1,6 @@
 package com.beproject.wordleapi.domain.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.Constraint;
-import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;

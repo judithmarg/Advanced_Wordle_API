@@ -48,7 +48,7 @@ public class WordOfTheDayServiceImpl implements WordOfTheDayService {
                 .orElseThrow(() -> new EntityNotFoundException("Word of the day not found with id: "+ id));
         mapper.updateEntityFromDto(request, wordOfTheDay);
         WordOfTheDay updatedWord = repository.save(wordOfTheDay);
-        return mapper.toDto(wordOfTheDay);
+        return mapper.toDto(updatedWord);
     }
 
 }
