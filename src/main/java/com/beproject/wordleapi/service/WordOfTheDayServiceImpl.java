@@ -3,6 +3,7 @@ package com.beproject.wordleapi.service;
 import com.beproject.wordleapi.domain.dto.WordOfTheDayRequest;
 import com.beproject.wordleapi.domain.dto.WordOfTheDayResponse;
 import com.beproject.wordleapi.domain.entity.WordOfTheDay;
+import com.beproject.wordleapi.domain.exception.WordExistentException;
 import com.beproject.wordleapi.mapper.WordOfTheDayMapper;
 import com.beproject.wordleapi.repository.WordOfTheDayRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -10,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -36,9 +38,12 @@ public class WordOfTheDayServiceImpl implements WordOfTheDayService {
     @Override
     @Transactional
     public WordOfTheDayResponse addWordOfTheDay(WordOfTheDayRequest wordOfTheDayRequest) {
+        LocalDate today = LocalDate.now();
+        if(repository.existsByPublishDate(today)){
+            throw new WordExistentException("{word.existent}");
+        }
         WordOfTheDay wordOfTheDay = mapper.toEntity(wordOfTheDayRequest);
-        wordOfTheDay = repository.save(wordOfTheDay);
-        return mapper.toDto(wordOfTheDay);
+        return mapper.toDto(repository.save(wordOfTheDay));
     }
 
     @Override

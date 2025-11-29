@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.UUID;
 
 @Entity
@@ -28,6 +28,6 @@ public class WordOfTheDay {
     private String word;
 
     @CreationTimestamp
-    @Column(nullable = false, unique = true)
-    private LocalDateTime publishDate;
+    @Column(nullable = false, updatable = false)
+    private LocalDate publishDate;
 }
