@@ -4,8 +4,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
 public record WordOfTheDayRequest(
-        @NotBlank
-        @Size(min = 1, max = 10, message = "{word.length}")
+        @NotBlank(message = "{word.blank}")
+        @Size(min = 5, max = 5, message = "{word.length}")
         String word
 ) {
 }
