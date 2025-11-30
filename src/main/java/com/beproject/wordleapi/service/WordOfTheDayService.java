@@ -8,6 +8,7 @@ import java.util.UUID;
 
 public interface WordOfTheDayService {
     List<WordOfTheDayResponse> getAllWordsOfTheDays();
+    WordOfTheDayResponse getTodayWordOfTheDay();
     WordOfTheDayResponse getWordOfTheDayById(UUID id);
     WordOfTheDayResponse addWordOfTheDay(WordOfTheDayRequest wordOfTheDayRequest);
     WordOfTheDayResponse updateWordOfTheDay(UUID id, WordOfTheDayRequest request);

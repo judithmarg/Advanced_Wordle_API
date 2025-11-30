@@ -24,6 +24,11 @@ public class WordOfTheDayController {
         return ResponseEntity.ok(service.getAllWordsOfTheDays());
     }
 
+    @GetMapping("/today")
+    public ResponseEntity<WordOfTheDayResponse> getTodayWordOfTheDay() {
+        return ResponseEntity.ok(service.getTodayWordOfTheDay());
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<WordOfTheDayResponse> getWordOfTheDay(@PathVariable UUID id) {
         return ResponseEntity.ok(service.getWordOfTheDayById(id));

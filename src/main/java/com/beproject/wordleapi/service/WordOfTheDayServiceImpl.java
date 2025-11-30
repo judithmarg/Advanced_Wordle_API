@@ -31,6 +31,14 @@ public class WordOfTheDayServiceImpl implements WordOfTheDayService {
     }
 
     @Override
+    public WordOfTheDayResponse getTodayWordOfTheDay() {
+        LocalDate today = LocalDate.now();
+        WordOfTheDay word = repository.findByPublishDate(today)
+                .orElseThrow(() -> new EntityNotFoundException("Word og the day was not defined."));
+        return mapper.toDto(word);
+    }
+
+    @Override
     public WordOfTheDayResponse getWordOfTheDayById(UUID id) {
         return repository.findById(id).map(mapper::toDto).orElse(null);
     }
