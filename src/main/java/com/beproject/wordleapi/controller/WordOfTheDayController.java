@@ -2,7 +2,7 @@ package com.beproject.wordleapi.controller;
 
 import com.beproject.wordleapi.domain.dto.WordOfTheDayRequest;
 import com.beproject.wordleapi.domain.dto.WordOfTheDayResponse;
-import com.beproject.wordleapi.service.WordOfTheDayServiceImpl;
+import com.beproject.wordleapi.service.WordOfTheDayService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -25,7 +25,7 @@ import java.util.UUID;
 @SecurityRequirement(name = "bearerAuth")
 public class WordOfTheDayController {
 
-    private final WordOfTheDayServiceImpl service;
+    private final WordOfTheDayService service;
 
     /**
      * This method return all words established
