@@ -22,6 +22,10 @@ public class WordOfTheDayServiceImpl implements WordOfTheDayService {
     private final WordOfTheDayRepository repository;
     private final WordOfTheDayMapper mapper;
 
+    /**
+     * This method return all words established
+     * @return List of DTOs of words of the days
+     */
     @Override
     public List<WordOfTheDayResponse> getAllWordsOfTheDays() {
         return repository.findAll()
@@ -30,19 +34,34 @@ public class WordOfTheDayServiceImpl implements WordOfTheDayService {
                 .toList();
     }
 
+    /**
+     * This method return the word for today
+     * @return DTO of word of the day
+     */
     @Override
     public WordOfTheDayResponse getTodayWordOfTheDay() {
         LocalDate today = LocalDate.now();
         WordOfTheDay word = repository.findByPublishDate(today)
-                .orElseThrow(() -> new EntityNotFoundException("Word og the day was not defined."));
+                .orElseThrow(() -> new EntityNotFoundException("Word of the day was not defined."));
         return mapper.toDto(word);
     }
 
+    /**
+     * This method return the word of the day given an id
+     * @param id
+     * @return DTO of word of the day with that id
+     */
     @Override
     public WordOfTheDayResponse getWordOfTheDayById(UUID id) {
-        return repository.findById(id).map(mapper::toDto).orElse(null);
+        return repository.findById(id).map(mapper::toDto)
+                .orElseThrow(() -> new EntityNotFoundException("Word of the day not found with id: "+ id));
     }
 
+    /**
+     * This method create the word of today, if it exists, throws an error
+     * @param wordOfTheDayRequest
+     * @return DTO of word of the day already created
+     */
     @Override
     @Transactional
     public WordOfTheDayResponse addWordOfTheDay(WordOfTheDayRequest wordOfTheDayRequest) {
@@ -54,6 +73,12 @@ public class WordOfTheDayServiceImpl implements WordOfTheDayService {
         return mapper.toDto(repository.saveAndFlush(wordOfTheDay));
     }
 
+    /**
+     * This method update the word of a day, if its id does not exist, throws an error
+     * @param id
+     * @param request
+     * @return DTO of word of the day already updated
+     */
     @Override
     @Transactional
     public WordOfTheDayResponse updateWordOfTheDay(UUID id, WordOfTheDayRequest request) {

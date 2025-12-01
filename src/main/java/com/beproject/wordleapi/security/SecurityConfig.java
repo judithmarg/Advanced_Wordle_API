@@ -34,7 +34,8 @@ public class SecurityConfig {
                     "/swagger-ui/**",
                     "/swagger-ui.html", 
                     "/swagger-resources/**",
-                    "/webjars/**"
+                    "/webjars/**",
+                    "/word-of-the-day/**" //Remove later when it have relation with users and roles
                 ).permitAll()
                 .anyRequest().authenticated()
             )
