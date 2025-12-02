@@ -4,6 +4,8 @@ import com.beproject.wordleapi.config.GuessChainConfig;
 import com.beproject.wordleapi.domain.dto.PressedLetterDTO;
 import com.beproject.wordleapi.domain.dto.ResultGuessDTO;
 import com.beproject.wordleapi.domain.dto.WordGuessDTO;
+import com.beproject.wordleapi.domain.entity.GameSession;
+import com.beproject.wordleapi.repository.GameSessionRepository;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
@@ -17,59 +19,40 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class GameSessionServiceImpl implements GameSessionService {
 
+    private final GuessHandler guessWordChain;
     private final DailyChallengeService dailyChallengeService;
-    private final RowPlayedService rowPlayedService;
-    private final PressedLetterService pressedLetterService;
+//    private final RowPlayedService rowPlayedService;
+//    private final PressedLetterService pressedLetterService;
+    private GameSessionRepository  gameSessionRepository;
     private final Dictionary dictionary;
 
-    private static final int TOTAL_ROWS = 6;
-
-//    private GuessChainConfig guessWordChain;
     @Override
     public ResultGuessDTO guessWord(WordGuessDTO wordGuessDTO) {
 
+        String targetWord = getTargetWord(wordGuessDTO.playMode());
+        UUID gameSessionId = startGame();
         ResultGuessDTO resultGuessDTO = new ResultGuessDTO();
-        String wordAttempt = wordGuessDTO.word();
 
-//        String wordTarget = getTargetWord(wordGuessDTO.playMode());
+        return guessWordChain.handle(
+                wordGuessDTO.word(), targetWord, null, gameSessionId, resultGuessDTO
+        );
+    }
 
-//        if(rowPlayedService.getNumRow() >= TOTAL_ROWS) {
-            resultGuessDTO.setWordContent(wordAttempt);
-            resultGuessDTO.setNumberRow(TOTAL_ROWS);
-            resultGuessDTO.setStatus("LOST");
-//            resultGuessDTO.setPressedLetters(pressedLetterService.getLetters());
-            return  resultGuessDTO;
-//        }
-//        int currentRow = rowPlayedService.addAttempt();
-//        resultGuessDTO.setNumberRow(currentRow);
-//        String resultPattern = rowPlayedService.compareAttempt(wordAttempt);  //save
-//
-//        pressedLetterService.savePressedLetters(resultPattern, currentRow); //to add more
-//        resultGuessDTO.setPressedLetters(pressedLetterService.getAllByGameSession(gameSeession));
-//        long correctLength = new ArrayList<>(List.of(resultPattern)).stream().filter(l -> l == "C").count();
-//
-//        resultGuessDTO.setStatus(correctLength == 5 ? "CORRECT" : "PROGRESS");
-//
-//        return resultGuessDTO;
-//            resultGuessDTO.setRowNumber(rowPlayedService.addAttempt());
-//            PressedLetterDTO p = pressedLetterService.findByRow(rowPlayedService.getId());
-//            List result = p.stream().filter(e -> e.equals("CORRECT")).toList;
-//            if(result.length == 5) {
-//                resultGuessDTO.setStatus("WIN");
-//            } else {
-//                resultGuessDTO.setStatus("PROGRESS");
-//            }
+
+    private String getTargetWord(String mode) {
+        if ("DAILY".equals(mode)) {
+            return dailyChallengeService.getWordToday();
         }
-
-
-        public ResultGuessDTO guessWordChain(WordGuessDTO wordGuessDTO) {
-            ResultGuessDTO resultGuessDTO = new ResultGuessDTO();
-            String wordTarget = getTargetWord(wordGuessDTO.playMode());
-            return guessWordChain.handle( wordGuessDTO.word(), wordTarget, startGame(),resultGuessDTO);
+        if ("RANDOM".equals(mode)) {
+            return dictionary.getRandomWord();
+        }
+        throw new IllegalArgumentException("Invalid mode");
     }
 
     public UUID startGame() {
-        //quiero obtener el id del juego, ahora no hay usuarios que hago?
-
+        // Por ahora no hay user: creamos una sesión vacía temporal
+        GameSession s = new GameSession();
+        gameSessionRepository.save(s);
+        return s.getId();
     }
 }

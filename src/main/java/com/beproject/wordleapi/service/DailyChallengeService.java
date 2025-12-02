@@ -2,6 +2,7 @@ package com.beproject.wordleapi.service;
 
 import com.beproject.wordleapi.domain.dto.PressedLetterDTO;
 import com.beproject.wordleapi.domain.dto.ResultGuessDTO;
+import com.beproject.wordleapi.domain.dto.WordOfTheDayResponse;
 import com.beproject.wordleapi.repository.DailyChallengeRepository;
 
 import java.util.List;
@@ -11,6 +12,7 @@ public class DailyChallengeService implements GuessHandler{
 
     private GuessHandler next;
     private DailyChallengeRepository repository;
+    private WordOfTheDayService  wordOfTheDayService;
 
     @Override
     public void setNext(GuessHandler next) {
@@ -37,5 +39,9 @@ public class DailyChallengeService implements GuessHandler{
             return next.handle(attempt, target, pressedLetters, gameSessionId, result);
         }
         return result;
+    }
+
+    public String getWordToday() {
+        return wordOfTheDayService.getTodayWordOfTheDay().word();
     }
 }

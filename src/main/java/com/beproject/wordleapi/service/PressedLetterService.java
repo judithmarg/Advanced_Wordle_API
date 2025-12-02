@@ -3,14 +3,10 @@ package com.beproject.wordleapi.service;
 import com.beproject.wordleapi.domain.dto.PressedLetterDTO;
 import com.beproject.wordleapi.domain.dto.ResultGuessDTO;
 import com.beproject.wordleapi.domain.entity.PressedLetter;
-import com.beproject.wordleapi.domain.entity.RowPlayed;
 import com.beproject.wordleapi.repository.PressedLetterRepository;
-import com.beproject.wordleapi.repository.RowPlayedRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.lang.reflect.Array;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.IntStream;
@@ -47,8 +43,7 @@ public class PressedLetterService implements GuessHandler {
         //logic to repeated letters
         IntStream.range(0, patternRes.size())
                         .forEach(index ->
-                        {repository.save(new PressedLetter(attempt.charAt(index), patternRes.get(index)))
-                        });
+                        { repository.save(new PressedLetter(attempt.charAt(index), patternRes.get(index))); });
 
     }
 }
