@@ -1,12 +1,18 @@
 package com.beproject.wordleapi.domain.dto;
 
+import lombok.*;
+
 import java.util.List;
 
-public record ResultGuessDTO(
-        String status,
-        int numberRow,
-        String wordContent,
-        String resultPattern,
-        List<PressedLetterDTO> pressedLetters
-) {
+@Getter
+@Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class ResultGuessDTO {
+        private String status;
+        private int numberRow;
+        private String wordContent;
+        private String resultPattern;
+        private List<PressedLetterDTO> pressedLetters;
 }
