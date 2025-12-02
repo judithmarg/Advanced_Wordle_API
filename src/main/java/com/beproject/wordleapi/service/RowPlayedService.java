@@ -1,11 +1,13 @@
 package com.beproject.wordleapi.service;
 
+import com.beproject.wordleapi.domain.dto.PressedLetterDTO;
 import com.beproject.wordleapi.domain.dto.ResultGuessDTO;
 import com.beproject.wordleapi.domain.entity.RowPlayed;
 import com.beproject.wordleapi.repository.RowPlayedRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -23,7 +25,7 @@ public class RowPlayedService implements GuessHandler {
     }
 
     @Override
-    public ResultGuessDTO handle(String attempt, String target, UUID gameSessionId, ResultGuessDTO result) {
+    public ResultGuessDTO handle(String attempt, String target, List<PressedLetterDTO> pressedLetters, UUID gameSessionId, ResultGuessDTO result) {
         int totalRows = getTotalRowsPlayedByGame(gameSessionId);
         if( totalRows >= 6) {
             result.setStatus("LOST");
@@ -40,7 +42,7 @@ public class RowPlayedService implements GuessHandler {
         result.setResultPattern(pattern);
 
         if ( next != null) {
-            next.handle(attempt, target, gameSessionId, result);
+            next.handle(attempt, target, pressedLetters, gameSessionId, result);
         }
 
         return result;

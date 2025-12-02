@@ -12,6 +12,7 @@ import java.util.List;
 public class ResultGuessDTO {
         private String status;
         private int numberRow;
+        private String targetWord;
         private String wordContent;
         private String resultPattern;
         private List<PressedLetterDTO> pressedLetters;

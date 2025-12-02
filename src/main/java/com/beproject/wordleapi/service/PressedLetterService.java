@@ -1,5 +1,6 @@
 package com.beproject.wordleapi.service;
 
+import com.beproject.wordleapi.domain.dto.PressedLetterDTO;
 import com.beproject.wordleapi.domain.dto.ResultGuessDTO;
 import com.beproject.wordleapi.domain.entity.PressedLetter;
 import com.beproject.wordleapi.domain.entity.RowPlayed;
@@ -27,11 +28,11 @@ public class PressedLetterService implements GuessHandler {
     }
 
     @Override
-    public ResultGuessDTO handle(String attempt, String target, UUID gameSessionId, ResultGuessDTO result) {
+    public ResultGuessDTO handle(String attempt, String target, List<PressedLetterDTO> pressedLetters, UUID gameSessionId, ResultGuessDTO result) {
         saveAllLetters(attempt, target, gameSessionId);
 
         if( next!=null ) {
-            return next.handle(attempt, target, gameSessionId, result);
+            return next.handle(attempt, target, pressedLetters, gameSessionId, result);
         }
 
         return result;
