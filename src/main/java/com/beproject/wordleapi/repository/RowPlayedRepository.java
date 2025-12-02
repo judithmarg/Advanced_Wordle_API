@@ -11,6 +11,6 @@ import java.util.UUID;
 @Repository
 public interface RowPlayedRepository extends JpaRepository<RowPlayed, UUID> {
 
-    @Query(value = "SELECT COUNT(*) FROM row_played r WHERE r.game_session_id = :gameSessionId", nativeQuery = true)
+    @Query("SELECT COUNT(r) FROM RowPlayed r WHERE r.gameSession.id = :gameSessionId")
     int countByGameSession(@Param("gameSessionId") UUID gameSessionId);
 }

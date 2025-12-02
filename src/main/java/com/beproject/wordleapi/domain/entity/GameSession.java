@@ -21,7 +21,7 @@ public class GameSession {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
-    @Column(length = 5, nullable = false)
+    @Column(length = 5)
     private String targetWord;
 
     @Column(length = 20, nullable = false)

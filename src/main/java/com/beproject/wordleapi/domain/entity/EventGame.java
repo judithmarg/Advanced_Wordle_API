@@ -9,9 +9,6 @@ import java.util.UUID;
 @Table(name = "event_game")
 @Getter
 @Setter
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
 @Inheritance(strategy = InheritanceType.JOINED)
 public class EventGame {
     @Id

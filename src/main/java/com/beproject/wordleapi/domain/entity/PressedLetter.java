@@ -7,7 +7,6 @@ import lombok.*;
 @Table(name = "pressed_letter", uniqueConstraints = @UniqueConstraint(columnNames = {"game_session_id", "letter"}))
 @Getter
 @Setter
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class PressedLetter extends EventGame{

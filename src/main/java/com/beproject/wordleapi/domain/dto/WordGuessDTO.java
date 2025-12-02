@@ -11,7 +11,7 @@ public record WordGuessDTO (
         String word,
 
         @NotBlank(message = "{word.blank}")
-        @Pattern(regexp = "[DAILY|RANDOM]", message = "{mode.allowed}")
+        @Pattern(regexp = "^(DAILY|RANDOM)$", message = "{mode.allowed}")
         String playMode
 )
 { }

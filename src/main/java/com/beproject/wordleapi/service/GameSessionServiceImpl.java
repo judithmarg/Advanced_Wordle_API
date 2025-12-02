@@ -1,47 +1,42 @@
 package com.beproject.wordleapi.service;
 
-import com.beproject.wordleapi.config.GuessChainConfig;
-import com.beproject.wordleapi.domain.dto.PressedLetterDTO;
 import com.beproject.wordleapi.domain.dto.ResultGuessDTO;
 import com.beproject.wordleapi.domain.dto.WordGuessDTO;
 import com.beproject.wordleapi.domain.entity.GameSession;
 import com.beproject.wordleapi.repository.GameSessionRepository;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class GameSessionServiceImpl implements GameSessionService {
 
+    @Qualifier("guessChain")
     private final GuessHandler guessWordChain;
-    private final DailyChallengeService dailyChallengeService;
-//    private final RowPlayedService rowPlayedService;
-//    private final PressedLetterService pressedLetterService;
-    private GameSessionRepository  gameSessionRepository;
+    private final GameSessionRepository  gameSessionRepository;
     private final Dictionary dictionary;
 
     @Override
     public ResultGuessDTO guessWord(WordGuessDTO wordGuessDTO) {
 
         String targetWord = getTargetWord(wordGuessDTO.playMode());
-        UUID gameSessionId = startGame();
+        GameSession gameSession = startGame(targetWord,wordGuessDTO.playMode());
         ResultGuessDTO resultGuessDTO = new ResultGuessDTO();
 
         return guessWordChain.handle(
-                wordGuessDTO.word(), targetWord, null, gameSessionId, resultGuessDTO
+                wordGuessDTO.word(), targetWord, null, gameSession, resultGuessDTO
         );
     }
 
 
     private String getTargetWord(String mode) {
         if ("DAILY".equals(mode)) {
-            return dailyChallengeService.getWordToday();
+            return null;
         }
         if ("RANDOM".equals(mode)) {
             return dictionary.getRandomWord();
@@ -49,10 +44,23 @@ public class GameSessionServiceImpl implements GameSessionService {
         throw new IllegalArgumentException("Invalid mode");
     }
 
-    public UUID startGame() {
-        // Por ahora no hay user: creamos una sesión vacía temporal
-        GameSession s = new GameSession();
-        gameSessionRepository.save(s);
-        return s.getId();
+    public GameSession startGame(String targetWord, String playMode) {
+
+        //here filtrar gameSession de un usuario del dia de hoy y luego lo de abajo
+        log.info("luego de jugar una vez  target {}", targetWord);
+        log.info("luego de jugar una vez  playmode {}", playMode);
+        List<GameSession> lastSession = gameSessionRepository.findLastByModeAndStatus(playMode, "IN PROGRESS");
+
+        if (!lastSession.isEmpty()) {
+            log.info("luego de jugar una vez  last session {}", lastSession.get(0).getId());
+            return lastSession.get(0);
+        }
+
+        GameSession session = new GameSession();
+        session.setMode(playMode);
+        session.setTargetWord(targetWord);
+        session.setStatus("IN PROGRESS");
+        gameSessionRepository.save(session);
+        return session;
     }
 }

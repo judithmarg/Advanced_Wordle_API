@@ -7,9 +7,6 @@ import lombok.*;
 @Table(name = "row_played")
 @Getter
 @Setter
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
 public class RowPlayed extends EventGame{
 
     private int rowNumber;

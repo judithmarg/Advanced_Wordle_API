@@ -8,6 +8,6 @@ import java.util.List;
 import java.util.UUID;
 
 public interface PressedLetterRepository extends JpaRepository<PressedLetter, UUID> {
-    @Query()
+    @Query(value = "SELECT p FROM PressedLetter p WHERE p.gameSession.id = :gameSessionId", nativeQuery = true)
     List<PressedLetter> findByGameSessionId(UUID gameSessionId);
 }
