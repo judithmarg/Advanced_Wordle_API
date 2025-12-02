@@ -74,7 +74,7 @@ public class WordOfTheDayServiceImpl implements WordOfTheDayService {
             throw new WordExistentException("{word.existent}");
         }
         WordOfTheDay wordOfTheDay = mapper.toEntity(wordOfTheDayRequest);
-        return mapper.toDto(repository.saveAndFlush(wordOfTheDay));
+        return mapper.toDto(repository.save(wordOfTheDay)); 
     }
 
     /**
