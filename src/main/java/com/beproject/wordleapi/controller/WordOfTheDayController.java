@@ -6,11 +6,13 @@ import com.beproject.wordleapi.service.WordOfTheDayServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,6 +22,7 @@ import java.util.UUID;
 @RequestMapping("/word-of-the-day")
 @RequiredArgsConstructor
 @Tag(name = "Word of the day", description = "Gestión de la palabra del dia")
+@SecurityRequirement(name = "bearerAuth")
 public class WordOfTheDayController {
 
     private final WordOfTheDayServiceImpl service;
@@ -36,6 +39,7 @@ public class WordOfTheDayController {
             @ApiResponse(responseCode = "200", description = "Lista obtenida correctamente")
     })
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')") 
     public ResponseEntity<List<WordOfTheDayResponse>> getAllWordsOfTheDays() {
         return ResponseEntity.ok(service.getAllWordsOfTheDays());
     }
@@ -53,6 +57,7 @@ public class WordOfTheDayController {
             @ApiResponse(responseCode = "404", description = "No existe palabra asignada para hoy")
     })
     @GetMapping("/today")
+    @PreAuthorize("hasAnyRole('ADMIN', 'PLAYER')")
     public ResponseEntity<WordOfTheDayResponse> getTodayWordOfTheDay() {
         return ResponseEntity.ok(service.getTodayWordOfTheDay());
     }
@@ -71,6 +76,7 @@ public class WordOfTheDayController {
             @ApiResponse(responseCode = "404", description = "No existe una palabra con ese id")
     })
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'PLAYER')")
     public ResponseEntity<WordOfTheDayResponse> getWordOfTheDay(@PathVariable UUID id) {
         return ResponseEntity.ok(service.getWordOfTheDayById(id));
     }
@@ -87,9 +93,11 @@ public class WordOfTheDayController {
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "Palabra creada correctamente"),
             @ApiResponse(responseCode = "400", description = "Datos inválidos en la solicitud"),
-            @ApiResponse(responseCode = "409", description = "Ya existe una palabra para el día de hoy")
+            @ApiResponse(responseCode = "409", description = "Ya existe una palabra para el día de hoy"),
+
     })
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<WordOfTheDayResponse> addWordOfTheDay(@Valid @RequestBody WordOfTheDayRequest wordOfTheDayRequest) {
         return ResponseEntity.status(HttpStatus.CREATED).body(service.addWordOfTheDay((wordOfTheDayRequest)));
     }
@@ -110,6 +118,7 @@ public class WordOfTheDayController {
             @ApiResponse(responseCode = "404", description = "No existe una palabra con ese ID")
     })
     @PatchMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<WordOfTheDayResponse> modifyWordOfTheDay(@PathVariable UUID id, @Valid @RequestBody WordOfTheDayRequest request) {
         return ResponseEntity.ok(service.updateWordOfTheDay(id, request));
     }
