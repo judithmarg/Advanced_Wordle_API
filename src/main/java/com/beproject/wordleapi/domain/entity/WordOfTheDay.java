@@ -2,12 +2,12 @@ package com.beproject.wordleapi.domain.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
-
 import java.time.LocalDate;
 import java.util.UUID;
+
 
 @Entity
 @Table(

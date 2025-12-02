@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -27,11 +28,12 @@ public class WordOfTheDayServiceImpl implements WordOfTheDayService {
      * @return List of DTOs of words of the days
      */
     @Override
+    @Transactional(readOnly = true)
     public List<WordOfTheDayResponse> getAllWordsOfTheDays() {
         return repository.findAll()
                 .stream()
                 .map(mapper::toDto)
-                .toList();
+                .collect(Collectors.toList());
     }
 
     /**
@@ -39,6 +41,7 @@ public class WordOfTheDayServiceImpl implements WordOfTheDayService {
      * @return DTO of word of the day
      */
     @Override
+    @Transactional(readOnly = true)
     public WordOfTheDayResponse getTodayWordOfTheDay() {
         LocalDate today = LocalDate.now();
         WordOfTheDay word = repository.findByPublishDate(today)
@@ -52,6 +55,7 @@ public class WordOfTheDayServiceImpl implements WordOfTheDayService {
      * @return DTO of word of the day with that id
      */
     @Override
+    @Transactional(readOnly = true)
     public WordOfTheDayResponse getWordOfTheDayById(UUID id) {
         return repository.findById(id).map(mapper::toDto)
                 .orElseThrow(() -> new EntityNotFoundException("Word of the day not found with id: "+ id));
