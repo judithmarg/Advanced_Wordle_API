@@ -28,6 +28,15 @@ public class RowPlayedService implements GuessHandler {
         this.next = next;
     }
 
+    /**
+     * This method continues with chain defining the pattern and row played in the game
+     * @param attempt
+     * @param target
+     * @param pressedLetters
+     * @param gameSession
+     * @param result
+     * @return a ResultGuessDTO
+     */
     @Override
     public ResultGuessDTO handle(String attempt, String target, List<PressedLetterDTO> pressedLetters, GameSession gameSession, ResultGuessDTO result) {
 
@@ -54,8 +63,8 @@ public class RowPlayedService implements GuessHandler {
     }
 
     /**
-     * Generate pattern according the next table:
-     * C = Correcto
+     * To generate pattern according the next table:
+     * C = Correct
      * M = Misplaced
      * W = Wrong
      */
@@ -90,10 +99,22 @@ public class RowPlayedService implements GuessHandler {
         return  patternFinal;
     }
 
+    /**
+     * To obtain the total rows in a defined session
+     * @param gameSessionId
+     * @return integer for that amount
+     */
     public int getTotalRowsPlayedByGame (UUID gameSessionId) {
         return rowPlayedRepository.countByGameSession(gameSessionId);
     }
 
+    /**
+     * This method update the saving of the row played
+     * @param attempt
+     * @param pattern
+     * @param num
+     * @param gameSession
+     */
     public void saveRow(String attempt, String pattern, int num, GameSession gameSession) {
         RowPlayed row = new RowPlayed();
         row.setGameSession(gameSession);

@@ -39,7 +39,7 @@ public class WordOfTheDayController {
             @ApiResponse(responseCode = "200", description = "Lista obtenida correctamente")
     })
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN')") 
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public ResponseEntity<List<WordOfTheDayResponse>> getAllWordsOfTheDays() {
         return ResponseEntity.ok(service.getAllWordsOfTheDays());
     }
@@ -57,7 +57,7 @@ public class WordOfTheDayController {
             @ApiResponse(responseCode = "404", description = "No existe palabra asignada para hoy")
     })
     @GetMapping("/today")
-    @PreAuthorize("hasAnyRole('ADMIN', 'PLAYER')")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public ResponseEntity<WordOfTheDayResponse> getTodayWordOfTheDay() {
         return ResponseEntity.ok(service.getTodayWordOfTheDay());
     }
@@ -76,7 +76,7 @@ public class WordOfTheDayController {
             @ApiResponse(responseCode = "404", description = "No existe una palabra con ese id")
     })
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'PLAYER')")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public ResponseEntity<WordOfTheDayResponse> getWordOfTheDay(@PathVariable UUID id) {
         return ResponseEntity.ok(service.getWordOfTheDayById(id));
     }
@@ -97,7 +97,7 @@ public class WordOfTheDayController {
 
     })
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public ResponseEntity<WordOfTheDayResponse> addWordOfTheDay(@Valid @RequestBody WordOfTheDayRequest wordOfTheDayRequest) {
         return ResponseEntity.status(HttpStatus.CREATED).body(service.addWordOfTheDay((wordOfTheDayRequest)));
     }
@@ -118,7 +118,7 @@ public class WordOfTheDayController {
             @ApiResponse(responseCode = "404", description = "No existe una palabra con ese ID")
     })
     @PatchMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public ResponseEntity<WordOfTheDayResponse> modifyWordOfTheDay(@PathVariable UUID id, @Valid @RequestBody WordOfTheDayRequest request) {
         return ResponseEntity.ok(service.updateWordOfTheDay(id, request));
     }

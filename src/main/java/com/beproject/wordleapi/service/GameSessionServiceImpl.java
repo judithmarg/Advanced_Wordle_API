@@ -27,13 +27,19 @@ public class GameSessionServiceImpl implements GameSessionService {
         String targetWord = getTargetWord(wordGuessDTO.playMode());
         GameSession gameSession = startGame(targetWord,wordGuessDTO.playMode());
         ResultGuessDTO resultGuessDTO = new ResultGuessDTO();
+        String wordUppercase = wordGuessDTO.word().toUpperCase();
 
         return guessWordChain.handle(
-                wordGuessDTO.word(), targetWord, null, gameSession, resultGuessDTO
+                wordUppercase, targetWord, null, gameSession, resultGuessDTO
         );
     }
 
 
+    /**
+     * This method obtains the word if the mode is random
+     * @param mode
+     * @return null if the mode is daily
+     */
     private String getTargetWord(String mode) {
         if ("DAILY".equals(mode)) {
             return null;
@@ -44,7 +50,13 @@ public class GameSessionServiceImpl implements GameSessionService {
         throw new IllegalArgumentException("Invalid mode");
     }
 
-    public GameSession startGame(String targetWord, String playMode) {
+    /**
+     * This method start the game with a new session or in case of existing a current game session, continue with that
+     * @param targetWord
+     * @param playMode
+     * @return GameSession for continue or start a game
+     */
+    private GameSession startGame(String targetWord, String playMode) {
 
         //here filtrar gameSession de un usuario del dia de hoy y luego lo de abajo
         log.info("Juego iniciado en modo {}", playMode);

@@ -12,9 +12,13 @@ public class Dictionary {
 
     public Dictionary() {
         manyWords = new ArrayList<>();
-        manyWords.addAll(List.of("avion", "novel", "water", "gemas", "house", "osito","libre", "month", "again"));
+        manyWords.addAll(List.of("AVION", "NOVEL", "WATER", "GEMAS", "HOUSE", "OSITO","LIBRE", "MONTH", "AGAIN"));
     }
 
+    /**
+     * This method simulates the random selection of a word in dictionary
+     * @return
+     */
     public String getRandomWord() {
         int random = new Random().nextInt(manyWords.size());
         return manyWords.get(random);
