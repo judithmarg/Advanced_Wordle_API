@@ -25,6 +25,15 @@ public class GameEventService implements GuessHandler {
         this.next = next;
     }
 
+    /**
+     * This method helps to define the win, lost or progressing game, comparing the data received
+     * @param attempt
+     * @param target
+     * @param pressedLetters
+     * @param gameSession
+     * @param result
+     * @return ResultGuessDTO
+     */
     @Override
     public ResultGuessDTO handle(String attempt, String target, List<PressedLetterDTO> pressedLetters, GameSession gameSession, ResultGuessDTO result) {
         if(gameSession.getStatus().equals("LOST") && gameSession.getMode().equals("DAILY")) {
@@ -35,25 +44,13 @@ public class GameEventService implements GuessHandler {
 
         boolean win = verifyWinGame(attempt, target);
 
-        if (win) {
-            gameSession.setStatus("WIN");
+        if (win || result.getNumberRow() >= MAX_ATTEMPTS) {
+            gameSession.setStatus(win? "WIN":"LOST");
             gameSession.setCompletedAt(LocalDateTime.now());
             gameSessionRepository.save(gameSession);
-            result.setStatus("WIN");
+            result.setStatus(win? "WIN":"LOST");
             result.setTargetWord(target);
-            result.setPressedLetters(pressedLetters);
-            log.info("Juego concluido exitosamente en sesion {}", gameSession.getId());
-            return result;
-        }
-
-        if (result.getNumberRow() >= MAX_ATTEMPTS) {
-            gameSession.setStatus("LOST");
-            gameSession.setCompletedAt(LocalDateTime.now());
-            gameSessionRepository.save(gameSession);
-            result.setStatus("LOST");
-            result.setTargetWord(target);
-            result.setPressedLetters(pressedLetters);
-            log.info("Juego concluido al perder en sesion {}", gameSession.getId());
+            log.info("Juego concluido en sesion {}", gameSession.getId());
             return result;
         }
 

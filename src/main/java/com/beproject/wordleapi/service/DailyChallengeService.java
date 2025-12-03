@@ -26,6 +26,15 @@ public class DailyChallengeService implements GuessHandler{
         this.next = next;
     }
 
+    /**
+     * This method updates the target word if daily mode was selected
+     * @param attempt
+     * @param target
+     * @param pressedLetters
+     * @param gameSession
+     * @param result
+     * @return ResultGuessDTO
+     */
     @Override
     public ResultGuessDTO handle(String attempt, String target, List<PressedLetterDTO> pressedLetters, GameSession gameSession, ResultGuessDTO result) {
 
@@ -45,6 +54,15 @@ public class DailyChallengeService implements GuessHandler{
         return forward(attempt, wordDay, pressedLetters, gameSession,result);
     }
 
+    /**
+     * This method avoids duplicate code to continue with chain of responsability
+     * @param attempt
+     * @param target
+     * @param pressedLetters
+     * @param gameSession
+     * @param result
+     * @return a dto about dto for result
+     */
     private ResultGuessDTO forward(String attempt, String target, List<PressedLetterDTO> pressedLetters, GameSession gameSession, ResultGuessDTO result) {
         if ( next != null ) {
             return next.handle(attempt, target, pressedLetters, gameSession, result);
@@ -52,6 +70,11 @@ public class DailyChallengeService implements GuessHandler{
         return result;
     }
 
+    /**
+     * This method helps to create a daily challenge with DAILY mode
+     * @param gameSession
+     * @return the daily challenge
+     */
     private DailyChallenge createDailyChallenge(GameSession gameSession) {
         if(repository.existsByGameSession(gameSession)) {
             throw new IllegalStateException("La challenge ya existe");
@@ -66,6 +89,10 @@ public class DailyChallengeService implements GuessHandler{
         return repository.save(daily);
     }
 
+    /**
+     * This method returns the word of current day
+     * @return Entity about the word of current day
+     */
     public WordOfTheDay getWordToday() {
         return wordOfTheDayService.getTodayWord();
     }

@@ -29,10 +29,20 @@ public class PressedLetterService implements GuessHandler {
         this.next = next;
     }
 
+    /**
+     * This method continue with chain of responsibility to manage pressed letters in a session
+     * @param attempt
+     * @param target
+     * @param pressedLetters
+     * @param gameSession
+     * @param result
+     * @return ResultGuessDTO
+     */
     @Override
     public ResultGuessDTO handle(String attempt, String target, List<PressedLetterDTO> pressedLetters, GameSession gameSession, ResultGuessDTO result) {
         List<PressedLetterDTO> allLetters = saveAllLetters(attempt, result.getResultPattern(), gameSession);
 
+        result.setPressedLetters(allLetters);
         if( next!=null ) {
             return next.handle(attempt, target, allLetters, gameSession, result);
         }
@@ -40,7 +50,14 @@ public class PressedLetterService implements GuessHandler {
         return result;
     }
 
-    public List<PressedLetterDTO> saveAllLetters(String attempt, String pattern, GameSession gameSession) {
+    /**
+     * This method saves all letters without repetition, regarding a game session
+     * @param attempt
+     * @param pattern to compare more fast the letters in attempt
+     * @param gameSession
+     * @return List<PressedLetterDTO>
+     */
+    private List<PressedLetterDTO> saveAllLetters(String attempt, String pattern, GameSession gameSession) {
         List<String> patternRes = IntStream.range(0, pattern.length())
                         .mapToObj(i ->  pattern.charAt(i) == 'C' ? "CORRECT"
                                 : pattern.charAt(i) == 'M' ? "MISPLACED"
@@ -68,6 +85,12 @@ public class PressedLetterService implements GuessHandler {
         return repository.findByGameSessionId(gameSession.getId()).stream().map(e -> mapper.toDto(e)).toList();
     }
 
+    /**
+     * To define if the old pressed letter does not need to update, if the status is more Correct or Misplaced it stayed
+     * @param old
+     * @param current
+     * @return a boolean comparing the old and current letter with status
+     */
     private boolean notUpdatePressedLetter(PressedLetter old, PressedLetter current) {
         if(old.getStatus().equals(current.getStatus())) { return true; }
         return old.getStatus().equals("CORRECT") || (old.getStatus().equals("MISPLACED") && current.getStatus().equals("WRONG"));
