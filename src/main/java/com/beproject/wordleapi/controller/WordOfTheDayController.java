@@ -57,7 +57,7 @@ public class WordOfTheDayController {
             @ApiResponse(responseCode = "404", description = "No existe palabra asignada para hoy")
     })
     @GetMapping("/today")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')") 
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')") 
     public ResponseEntity<WordOfTheDayResponse> getTodayWordOfTheDay() {
         return ResponseEntity.ok(service.getTodayWordOfTheDay());
     }
@@ -76,7 +76,7 @@ public class WordOfTheDayController {
             @ApiResponse(responseCode = "404", description = "No existe una palabra con ese id")
     })
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')") 
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')") 
     public ResponseEntity<WordOfTheDayResponse> getWordOfTheDay(@PathVariable UUID id) {
         return ResponseEntity.ok(service.getWordOfTheDayById(id));
     }
