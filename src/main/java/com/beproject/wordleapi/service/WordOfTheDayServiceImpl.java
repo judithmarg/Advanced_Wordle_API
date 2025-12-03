@@ -74,6 +74,7 @@ public class WordOfTheDayServiceImpl implements WordOfTheDayService {
             throw new WordExistentException("{word.existent}");
         }
         WordOfTheDay wordOfTheDay = mapper.toEntity(wordOfTheDayRequest);
+        wordOfTheDay.setWord(wordOfTheDay.getWord().toUpperCase());
         return mapper.toDto(repository.saveAndFlush(wordOfTheDay));
     }
 
@@ -89,6 +90,7 @@ public class WordOfTheDayServiceImpl implements WordOfTheDayService {
         WordOfTheDay wordOfTheDay = repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Word of the day not found with id: "+ id));
         mapper.updateEntityFromDto(request, wordOfTheDay);
+        wordOfTheDay.setWord(wordOfTheDay.getWord().toUpperCase());
         WordOfTheDay updatedWord = repository.save(wordOfTheDay);
         return mapper.toDto(updatedWord);
     }
