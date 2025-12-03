@@ -171,30 +171,6 @@
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>${jacoco.version}</version>
-                
-                <!-- 1. CONFIGURACIÓN GLOBAL: Fuera de <executions> -->
-                <configuration>
-                    <includes>
-                        <!-- SOLO analizamos lo que tiene lógica y tests -->
-                        <include>com/beproject/wordleapi/service/**</include>
-                        <include>com/beproject/wordleapi/controller/**</include>
-                        <include>com/beproject/wordleapi/security/**</include>
-                    </includes>
-                    <!-- Las reglas también globales para asegurar que apliquen -->
-                    <rules>
-                        <rule>
-                            <element>BUNDLE</element>
-                            <limits>
-                                <limit>
-                                    <counter>INSTRUCTION</counter>
-                                    <value>COVEREDRATIO</value>
-                                    <minimum>0.70</minimum>
-                                </limit>
-                            </limits>
-                        </rule>
-                    </rules>
-                </configuration>
-
                 <executions>
                     <execution>
                         <goals>
@@ -213,9 +189,30 @@
                         <goals>
                             <goal>check</goal>
                         </goals>
+                        <configuration>
+                            <rules>
+                                <rule>
+                                    <element>BUNDLE</element>
+                                    <includes>
+                                        <include>com/beproject/wordleapi/service/**</include>
+                                        <include>com/beproject/wordleapi/controller/**</include>
+                                        <include>com/beproject/wordleapi/security/**</include>
+                                    </includes>
+                                    <limits>
+                                        <limit>
+                                            <counter>INSTRUCTION</counter>
+                                            <value>COVEREDRATIO</value>
+                                            <!-- Mínimo 70% global (puedes ajustar) -->
+                                            <minimum>0.70</minimum>
+                                        </limit>
+                                    </limits>
+                                </rule>
+                            </rules>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
         </plugins>
     </build>
+
 </project>
