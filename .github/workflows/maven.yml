@@ -2,7 +2,7 @@ name: Java CI with Maven
 
 on:
   push:
-    branches: [ "main", "dev" ]
+    branches: [ "**" ]  
   pull_request:
     branches: [ "main" ]
 
@@ -21,7 +21,6 @@ jobs:
         cache:maven: true
 
     - name: Build with Maven (Run Tests)
-      # Esto corre los tests y genera el reporte. Si falla la cobertura, falla el build.
       run: mvn -B verify
 
     - name: Upload JaCoCo Report
