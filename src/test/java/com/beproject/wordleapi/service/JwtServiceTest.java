@@ -7,6 +7,7 @@ import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.Collections;
 
@@ -22,6 +23,7 @@ class JwtServiceTest {
 
     @BeforeEach
     void setUp() {
+        ReflectionTestUtils.setField(jwtService, "secretKey", "1234567890ABCDEF1234567890ABCDEF1234567890ABCDEF1234567890ABCDEF");
         
         userDetails = new User("lucia", "password", Collections.emptyList());
     }
