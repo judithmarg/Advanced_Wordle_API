@@ -166,11 +166,22 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
             
-            <!-- JaCoCo Plugin: OBLIGATORIO para reporte de cobertura -->
+            <!-- JaCoCo Plugin -->
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>${jacoco.version}</version>
+
+                <configuration>
+                    <excludes>
+                        <exclude>**/domain/**</exclude>
+                        <exclude>**/config/**</exclude>
+                        <exclude>**/mapper/**</exclude>
+                        <exclude>**/exception/**</exclude>
+                        <exclude>**/*Application.*</exclude>
+                    </excludes>
+                </configuration>
+
                 <executions>
                     <execution>
                         <goals>
@@ -190,13 +201,6 @@
                             <goal>check</goal>
                         </goals>
                         <configuration>
-                            <excludes>
-                                <exclude>**/domain/**</exclude>
-                                <exclude>**/config/**</exclude>
-                                <exclude>**/mapper/**</exclude>
-                                <exclude>**/exception/**</exclude>
-                                <exclude>**/*Application.*</exclude>
-                            </excludes>
                             <rules>
                                 <rule>
                                     <element>BUNDLE</element>
