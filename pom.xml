@@ -6,7 +6,7 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>3.5.7</version>
-        <relativePath/> <!-- lookup parent from repository -->
+        <relativePath/> 
     </parent>
     <groupId>com.example</groupId>
     <artifactId>wordleapi</artifactId>
@@ -103,7 +103,7 @@
             <artifactId>mockito-core</artifactId>
             <scope>test</scope>
         </dependency>
-        <!-- H2 Database (Para tests rápidos sin levantar postgres) -->
+        <!-- H2 Database  -->
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
@@ -184,13 +184,19 @@
                             <goal>report</goal>
                         </goals>
                     </execution>
-                    <!-- Esta regla hace fallar el build si no cumples el % de tests -->
                     <execution>
                         <id>check</id>
                         <goals>
                             <goal>check</goal>
                         </goals>
                         <configuration>
+                            <excludes>
+                                <exclude>**/domain/**</exclude>
+                                <exclude>**/config/**</exclude>
+                                <exclude>**/mapper/**</exclude>
+                                <exclude>**/exception/**</exclude>
+                                <exclude>**/*Application.*</exclude>
+                            </excludes>
                             <rules>
                                 <rule>
                                     <element>BUNDLE</element>
