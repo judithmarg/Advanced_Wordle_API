@@ -21,12 +21,12 @@ public class DailyChallenge {
     @Id
     private UUID gameSessionId;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.EAGER)
     @MapsId
     @JoinColumn(name = "game_session_id")
     private GameSession gameSession;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "word_of_the_day_id", nullable = false)
     private WordOfTheDay wordOfTheDay;
 }

@@ -60,7 +60,8 @@ public class PressedLetterService implements GuessHandler {
             }else {
                 PressedLetter p = pressed.get();
                 if(!notUpdatePressedLetter(p, l)) {
-                    repository.saveAndFlush(l);
+                    p.setStatus(l.getStatus());
+                    repository.saveAndFlush(p);
                 }
             }
         });

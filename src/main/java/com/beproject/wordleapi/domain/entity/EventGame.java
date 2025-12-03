@@ -15,7 +15,7 @@ public class EventGame {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "game_session_id", nullable = false)
     private GameSession gameSession;
 
