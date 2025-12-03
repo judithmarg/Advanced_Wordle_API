@@ -1,11 +1,11 @@
 package com.beproject.wordleapi.domain.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -21,15 +21,23 @@ public class GameSession {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
-    @NotNull
+    @Column(length = 5)
     private String targetWord;
 
+    @Column(length = 20, nullable = false)
     private String mode;
 
+    @Column(length = 20, nullable = false)
     private String status;
 
     @CreationTimestamp
-    private LocalDateTime startAt;
+    private LocalDateTime startedAt;
 
     private LocalDateTime completedAt;
+
+    @OneToOne(mappedBy = "gameSession", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private DailyChallenge dailyChallenge;
+
+    @OneToMany(mappedBy = "gameSession", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<EventGame> eventsGame;
 }

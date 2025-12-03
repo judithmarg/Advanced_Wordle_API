@@ -6,6 +6,8 @@ import lombok.Setter;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 
@@ -30,4 +32,7 @@ public class WordOfTheDay {
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
     private LocalDate publishDate;
+
+    @OneToMany(mappedBy = "wordOfTheDay", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<DailyChallenge> dailyChallenges = new ArrayList<>();
 }

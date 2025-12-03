@@ -93,4 +93,12 @@ public class WordOfTheDayServiceImpl implements WordOfTheDayService {
         return mapper.toDto(updatedWord);
     }
 
+    @Override
+    public WordOfTheDay getTodayWord() {
+        LocalDate today = LocalDate.now();
+        return repository.findByPublishDate(today)
+                .orElseThrow(() -> new EntityNotFoundException("Word of the day was not defined."));
+    }
+
+
 }
