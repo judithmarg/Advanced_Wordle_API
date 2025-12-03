@@ -171,17 +171,6 @@
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>${jacoco.version}</version>
-
-                <configuration>
-                    <excludes>
-                        <exclude>**/domain/**</exclude>
-                        <exclude>**/config/**</exclude>
-                        <exclude>**/mapper/**</exclude>
-                        <exclude>**/exception/**</exclude>
-                        <exclude>**/*Application.*</exclude>
-                    </excludes>
-                </configuration>
-
                 <executions>
                     <execution>
                         <goals>
@@ -201,6 +190,11 @@
                             <goal>check</goal>
                         </goals>
                         <configuration>
+                            <includes>
+                                <include>com/beproject/wordleapi/service/**</include>
+                                <include>com/beproject/wordleapi/controller/**</include>
+                                <include>com/beproject/wordleapi/security/**</include>
+                            </includes>
                             <rules>
                                 <rule>
                                     <element>BUNDLE</element>
