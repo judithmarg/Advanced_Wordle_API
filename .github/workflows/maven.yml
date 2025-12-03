@@ -24,8 +24,8 @@ jobs:
       run: mvn -B verify
 
     - name: Upload JaCoCo Report
-      uses: actions/upload-artifact@v3
-      if: always() # Se sube aunque fallen los tests para ver qué pasó
+      if: always()
+      uses: actions/upload-artifact@v4
       with:
         name: jacoco-report
         path: target/site/jacoco/
