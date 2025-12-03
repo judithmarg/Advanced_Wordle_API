@@ -3,10 +3,12 @@ package com.beproject.wordleapi.service;
 import com.beproject.wordleapi.domain.dto.PressedLetterDTO;
 import com.beproject.wordleapi.domain.dto.ResultGuessDTO;
 import com.beproject.wordleapi.domain.entity.GameSession;
+import com.beproject.wordleapi.repository.GameSessionRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -15,6 +17,8 @@ import java.util.List;
 public class GameEventService implements GuessHandler {
 
     private GuessHandler next;
+    private final int MAX_ATTEMPTS = 6;
+    private final GameSessionRepository gameSessionRepository;
 
     @Override
     public void setNext(GuessHandler next) {
@@ -23,44 +27,39 @@ public class GameEventService implements GuessHandler {
 
     @Override
     public ResultGuessDTO handle(String attempt, String target, List<PressedLetterDTO> pressedLetters, GameSession gameSession, ResultGuessDTO result) {
-        log.info("entra a game event con target{}", target);
-        log.info("entra a game event con {}", gameSession.getStatus());
-        log.info("entra a game bolean con {}", gameSession.getStatus().equals("some"));
-        if(gameSession.getStatus().equals("LOST")) {
+        if(gameSession.getStatus().equals("LOST") && gameSession.getMode().equals("DAILY")) {
             result.setTargetWord(target);
             result.setStatus("LOST");
             return result;
         }
 
-        log.info("luego de lost segun status {}", gameSession.getStatus());
         boolean win = verifyWinGame(attempt, target);
-        log.info("luego de win segun status {}", win);
-
 
         if (win) {
             gameSession.setStatus("WIN");
+            gameSession.setCompletedAt(LocalDateTime.now());
+            gameSessionRepository.save(gameSession);
             result.setStatus("WIN");
             result.setTargetWord(target);
             result.setPressedLetters(pressedLetters);
-            log.info("luego de win conditional {}", result.getPressedLetters().get(0).status());
+            log.info("Juego concluido exitosamente en sesion {}", gameSession.getId());
             return result;
         }
 
-        if (result.getNumberRow() >= 6) {
+        if (result.getNumberRow() >= MAX_ATTEMPTS) {
             gameSession.setStatus("LOST");
+            gameSession.setCompletedAt(LocalDateTime.now());
+            gameSessionRepository.save(gameSession);
             result.setStatus("LOST");
             result.setTargetWord(target);
             result.setPressedLetters(pressedLetters);
-            log.info("luego de lost by attempts conditional, number presed letter {}", result.getPressedLetters());
+            log.info("Juego concluido al perder en sesion {}", gameSession.getId());
             return result;
         }
 
         result.setStatus("IN PROGRESS");
-        log.info("luego de win no conditional,  state {}", result.getStatus());
         result.setTargetWord(null);
-        log.info("luego de win no conditional,  target {}", result.getTargetWord()); //esto solo no deberia mostrarse pero si deberia continuar con su valor
         result.setPressedLetters(pressedLetters);
-        log.info("luego de win no conditional, number presed letter {}", result.getPressedLetters());
 
         return result;
 

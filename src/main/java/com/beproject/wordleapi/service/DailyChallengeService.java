@@ -29,9 +29,8 @@ public class DailyChallengeService implements GuessHandler{
     @Override
     public ResultGuessDTO handle(String attempt, String target, List<PressedLetterDTO> pressedLetters, GameSession gameSession, ResultGuessDTO result) {
 
-        //when the random mode is selected
         if(gameSession.getTargetWord() != null &&  !gameSession.getTargetWord().isEmpty()){
-            log.info("por game session {}", gameSession.getTargetWord());
+            log.info("Juego con la misma sesion{}", gameSession.getId());
             return forward(attempt, gameSession.getTargetWord(), pressedLetters, gameSession,result);
         }
 

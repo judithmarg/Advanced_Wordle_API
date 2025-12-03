@@ -5,6 +5,10 @@ import lombok.*;
 
 @Entity
 @Table(name = "pressed_letter", uniqueConstraints = @UniqueConstraint(columnNames = {"game_session_id", "letter"}))
+//@NamedQuery(
+//        name = "PressedLetter.findByGameSessionId",
+//        query = "SELECT p FROM PressedLetter p WHERE p.gameSession.id = :gameSessionId"
+//)
 @Getter
 @Setter
 @NoArgsConstructor

@@ -47,12 +47,10 @@ public class GameSessionServiceImpl implements GameSessionService {
     public GameSession startGame(String targetWord, String playMode) {
 
         //here filtrar gameSession de un usuario del dia de hoy y luego lo de abajo
-        log.info("luego de jugar una vez  target {}", targetWord);
-        log.info("luego de jugar una vez  playmode {}", playMode);
+        log.info("Juego iniciado en modo {}", playMode);
         List<GameSession> lastSession = gameSessionRepository.findLastByModeAndStatus(playMode, "IN PROGRESS");
 
         if (!lastSession.isEmpty()) {
-            log.info("luego de jugar una vez  last session {}", lastSession.get(0).getId());
             return lastSession.get(0);
         }
 

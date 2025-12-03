@@ -21,6 +21,7 @@ public class RowPlayedService implements GuessHandler {
 
     private GuessHandler next;
     private final RowPlayedRepository rowPlayedRepository;
+    private final int MAX_ATTEMPTS = 6;
 
     @Override
     public void setNext(GuessHandler next) {
@@ -29,15 +30,13 @@ public class RowPlayedService implements GuessHandler {
 
     @Override
     public ResultGuessDTO handle(String attempt, String target, List<PressedLetterDTO> pressedLetters, GameSession gameSession, ResultGuessDTO result) {
-        log.info("llegue aqui {}",attempt );
-        log.info("llegue aqui1 {}",target );
+
         int totalRows = getTotalRowsPlayedByGame(gameSession.getId());
-        if( totalRows >= 6) {
+        if( totalRows >= MAX_ATTEMPTS) {
             result.setStatus("LOST");
             return result;
         }
 
-        log.info("llegue con gameSession {}",gameSession.getId() );
         int currentRow = totalRows + 1;
         String pattern = generatePattern(attempt, target);
 
@@ -61,15 +60,34 @@ public class RowPlayedService implements GuessHandler {
      * W = Wrong
      */
     private String generatePattern(String attempt, String target) {
-        log.info("llegue aqui {}",target );
-        String pattern = IntStream.range(0, target.length())
-                .mapToObj(i -> attempt.charAt(i) == target.charAt(i) ? "C"
-                        : (target.indexOf(attempt.charAt(i)) != -1) ? "M"
-                        : "W")
-                .collect(Collectors.joining());
-        log.info("ddi {}",pattern );
+        char[] pattern = new char[target.length()];
+        boolean[] used = new boolean[target.length()];
 
-        return  pattern;
+        IntStream.range(0, target.length()).forEach(i -> {
+            if (attempt.charAt(i) == target.charAt(i)) {
+                pattern[i] = 'C';
+                used[i] = true;
+            }
+        });
+
+        String patternFinal = IntStream.range(0, target.length())
+                .mapToObj(i -> {
+                    if (pattern[i] == 'C') return "C"; // ya es correcta
+
+                    char a = attempt.charAt(i);
+                    boolean found = false;
+                    for (int j = 0; j < target.length(); j++) {
+                        if (!used[j] && target.charAt(j) == a) {
+                            found = true;
+                            used[j] = true;
+                            break;
+                        }
+                    }
+                    return found ? "M" : "W";
+                })
+                .collect(Collectors.joining());
+
+        return  patternFinal;
     }
 
     public int getTotalRowsPlayedByGame (UUID gameSessionId) {

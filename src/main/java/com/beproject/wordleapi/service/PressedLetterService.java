@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.IntStream;
 
 @Service
@@ -22,6 +23,7 @@ public class PressedLetterService implements GuessHandler {
     private final PressedLetterRepository repository;
     private final PressedLetterMapper mapper;
 
+
     @Override
     public void setNext(GuessHandler next) {
         this.next = next;
@@ -30,9 +32,7 @@ public class PressedLetterService implements GuessHandler {
     @Override
     public ResultGuessDTO handle(String attempt, String target, List<PressedLetterDTO> pressedLetters, GameSession gameSession, ResultGuessDTO result) {
         List<PressedLetterDTO> allLetters = saveAllLetters(attempt, result.getResultPattern(), gameSession);
-//        //maybe todavia
-//        result.setStatus("IN PROGRESS");
-//        result.setPressedLetters(allLetters);
+
         if( next!=null ) {
             return next.handle(attempt, target, allLetters, gameSession, result);
         }
@@ -50,12 +50,25 @@ public class PressedLetterService implements GuessHandler {
                 .mapToObj(i -> {
                     PressedLetter p = new PressedLetter(attempt.charAt(i), patternRes.get(i));
                     p.setGameSession(gameSession);
-                    log.info("hi agaiin {}", p.getStatus());
-                    log.info("hi agaiin2 {}", p.getLetter());
                     return p;
                 })
                 .toList();
-        repository.saveAll(allPressed);
-        return allPressed.stream().map(e -> mapper.toDto(e)).toList();
+        allPressed.stream().forEach(l -> {
+            Optional<PressedLetter> pressed = repository.findByGameSessionIdAndLetter(l.getGameSession().getId(), l.getLetter());
+            if(pressed.isEmpty()) {
+                repository.saveAndFlush(l);
+            }else {
+                PressedLetter p = pressed.get();
+                if(!notUpdatePressedLetter(p, l)) {
+                    repository.saveAndFlush(l);
+                }
+            }
+        });
+        return repository.findByGameSessionId(gameSession.getId()).stream().map(e -> mapper.toDto(e)).toList();
+    }
+
+    private boolean notUpdatePressedLetter(PressedLetter old, PressedLetter current) {
+        if(old.getStatus().equals(current.getStatus())) { return true; }
+        return old.getStatus().equals("CORRECT") || (old.getStatus().equals("MISPLACED") && current.getStatus().equals("WRONG"));
     }
 }
