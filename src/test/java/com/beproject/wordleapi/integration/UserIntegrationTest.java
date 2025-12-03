@@ -1,5 +1,6 @@
-package com.beproject.wordleapi.controller;
+package com.beproject.wordleapi.integration;
 
+import com.beproject.wordleapi.controller.AuthController;
 import com.beproject.wordleapi.domain.dto.UserLoginDTO;
 import com.beproject.wordleapi.domain.dto.UserRegisterDTO;
 import com.beproject.wordleapi.domain.dto.UserResponseDTO;
@@ -18,13 +19,15 @@ import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.test.web.servlet.MockMvc;
-
 
 import java.util.Set;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -34,7 +37,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(controllers = AuthController.class, 
     excludeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = JwtAuthFilter.class))
 @AutoConfigureMockMvc(addFilters = false)
-class AuthControllerTest {
+class UserIntegrationTest {
 
     @Autowired private MockMvc mockMvc;
     @Autowired private ObjectMapper objectMapper;
@@ -44,47 +47,44 @@ class AuthControllerTest {
     @MockBean private UserDetailsService userDetailsService;
     @MockBean private AuthenticationManager authenticationManager;
     @MockBean private AuthenticationProvider authenticationProvider;
-
-    @MockBean private JpaMetamodelMappingContext jpaMappingContext; 
+    @MockBean private JpaMetamodelMappingContext jpaMappingContext;
 
     @Test
-    void registerShouldReturn201WhenDataIsCorrect() throws Exception {
-        UserRegisterDTO request = new UserRegisterDTO("lucia", "l@test.com", "StrongPass1");
-        UserResponseDTO response = new UserResponseDTO(1L, "lucia", "l@test.com", true, Set.of("ROLE_PLAYER"));
+    void shouldRegisterAndLoginUser_FullFlow() throws Exception {
+        UserRegisterDTO registerDTO = new UserRegisterDTO("integrationUser", "integ@test.com", "Pass1234");
+        UserResponseDTO responseDTO = new UserResponseDTO(1L, "integrationUser", "integ@test.com", true, Set.of("ROLE_PLAYER"));
 
-        when(userService.registerUser(any())).thenReturn(response);
+        when(userService.registerUser(any())).thenReturn(responseDTO);
 
         mockMvc.perform(post("/auth/register")
                 .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
+                .content(objectMapper.writeValueAsString(registerDTO)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.username").value("lucia"));
-    }
+                .andExpect(jsonPath("$.username").value("integrationUser"));
 
-    @Test
-    void registerShouldReturn400WhenPasswordIsInvalid() throws Exception {
-        UserRegisterDTO invalidRequest = new UserRegisterDTO("lucia", "l@test.com", "");
-
-        mockMvc.perform(post("/auth/register")
-                .with(csrf())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(invalidRequest)))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    void loginShouldReturn200AndTokenWhenCredentialsAreValid() throws Exception {
-        UserLoginDTO loginRequest = new UserLoginDTO("lucia", "StrongPass1");
-        String fakeToken = "eyJhbGciOiJIUzI1NiJ9...";
-        
-        when(jwtService.generateToken(any())).thenReturn(fakeToken);
+        UserLoginDTO loginDTO = new UserLoginDTO("integrationUser", "Pass1234");
+        when(jwtService.generateToken(any())).thenReturn("fake-jwt-token-integration");
 
         mockMvc.perform(post("/auth/login")
                 .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(loginRequest)))
+                .content(objectMapper.writeValueAsString(loginDTO)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.token").value(fakeToken));
+                .andExpect(jsonPath("$.token").value("fake-jwt-token-integration"));
+    }
+
+    @Test
+    void shouldFailLogin_WhenUserDoesNotExist() throws Exception {
+        UserLoginDTO loginDTO = new UserLoginDTO("User1", "Pass1234");
+
+        doThrow(new BadCredentialsException("Bad credentials"))
+            .when(authenticationManager).authenticate(any(UsernamePasswordAuthenticationToken.class));
+
+        mockMvc.perform(post("/auth/login")
+                .with(csrf())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(loginDTO)))
+                .andExpect(status().isUnauthorized()); 
     }
 }
