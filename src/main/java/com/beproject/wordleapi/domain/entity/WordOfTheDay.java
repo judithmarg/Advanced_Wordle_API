@@ -1,7 +1,9 @@
 package com.beproject.wordleapi.domain.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -19,7 +21,8 @@ import java.util.UUID;
         })
 @Getter
 @Setter
-@RequiredArgsConstructor
+@NoArgsConstructor 
+@AllArgsConstructor
 public class WordOfTheDay {
 
     @Id
