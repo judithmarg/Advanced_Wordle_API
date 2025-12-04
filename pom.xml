@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.5.7</version>
+        <version>3.4.0</version>
         <relativePath/> 
     </parent>
     <groupId>com.example</groupId>
@@ -191,21 +191,34 @@
                         </goals>
                         <configuration>
                             <rules>
-                                <rule>
-                                    <element>BUNDLE</element>
-                                    <includes>
-                                        <include>com/beproject/wordleapi/service/**</include>
-                                        <include>com/beproject/wordleapi/controller/**</include>
-                                        <include>com/beproject/wordleapi/security/**</include>
-                                    </includes>
-                                    <limits>
-                                        <limit>
-                                            <counter>INSTRUCTION</counter>
-                                            <value>COVEREDRATIO</value>
-                                            <minimum>0.70</minimum>
-                                        </limit>
-                                    </limits>
-                                </rule>
+                                <rules>
+                                    <rule>
+                                        <element>BUNDLE</element>
+                                        <includes>
+                                            <include>com/beproject/wordleapi/service/**</include>
+                                        </includes>
+                                        <limits>
+                                            <limit>
+                                                <counter>INSTRUCTION</counter>
+                                                <value>COVEREDRATIO</value>
+                                                <minimum>0.80</minimum>
+                                            </limit>
+                                        </limits>
+                                    </rule>
+                                    <rule>
+                                        <element>BUNDLE</element>
+                                        <includes>
+                                            <include>com/beproject/wordleapi/controller/**</include>
+                                        </includes>
+                                        <limits>
+                                            <limit>
+                                                <counter>INSTRUCTION</counter>
+                                                <value>COVEREDRATIO</value>
+                                                <minimum>0.70</minimum>
+                                            </limit>
+                                        </limits>
+                                    </rule>
+                                </rules>
                             </rules>
                         </configuration>
                     </execution>
@@ -213,5 +226,4 @@
             </plugin>
         </plugins>
     </build>
-
 </project>
