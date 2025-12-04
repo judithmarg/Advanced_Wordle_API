@@ -41,9 +41,9 @@ public class GameController {
             @ApiResponse(responseCode = "400", description = "Datos inválidos en la solicitud")
     })
     @PostMapping("/guess")
-    @PreAuthorize("hasAuthority('ROLE_ADMIN','ROLE_PLAYER')")
-    public ResponseEntity<ResultGuessDTO> addWordOfTheDay(@Valid @RequestBody WordGuessDTO wordGuessDTO) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(service.guessWord((wordGuessDTO)));
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_PLAYER')")
+    public ResponseEntity<ResultGuessDTO> guessWord(@Valid @RequestBody WordGuessDTO wordGuessDTO) {
+        return ResponseEntity.ok(service.guessWord(wordGuessDTO));
     }
 
 }

@@ -12,8 +12,10 @@ import java.util.UUID;
 @Repository
 public interface DailyChallengeRepository extends JpaRepository<DailyChallenge, UUID> {
 
-    @Query("SELECT d FROM DailyChallenge d WHERE d.gameSessionId = : gameId")
-    void findByDailyPlay(@Param("gameId") UUID gameId);
+    @Query("SELECT d FROM DailyChallenge d WHERE d.gameSessionId = :gameId")
+    DailyChallenge findByDailyPlay(@Param("gameId") UUID gameId);
 
     boolean existsByGameSession(GameSession gameSession);
 }
+
+
