@@ -46,7 +46,7 @@ public class GameSessionServiceTest {
         WordGuessDTO dto = new WordGuessDTO("hello", "DAILY");
 
         GameSession existing = getSession("DAILY", null);
-        when(gameSessionRepository.findLastByModeAndStatus("DAILY", "IN PROGRESS"))
+        when(gameSessionRepository.findLastByModeAndStatus(1L, "DAILY", "IN PROGRESS"))
                 .thenReturn(List.of(existing));
 
         ResultGuessDTO output = new ResultGuessDTO();
