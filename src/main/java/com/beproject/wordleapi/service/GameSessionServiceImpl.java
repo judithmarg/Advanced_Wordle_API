@@ -49,7 +49,7 @@ public class GameSessionServiceImpl implements GameSessionService {
         );
     }
 
-    private User getAuthenticatedUser() {
+    protected User getAuthenticatedUser() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         return userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado en sesión"));
@@ -72,7 +72,7 @@ public class GameSessionServiceImpl implements GameSessionService {
 
     /**
      * This method start the game with a new session or in case of existing a current game session, continue with that
-     * @param targetWord
+     * @param playMode
      * @param playMode
      * @return GameSession for continue or start a game
      */
