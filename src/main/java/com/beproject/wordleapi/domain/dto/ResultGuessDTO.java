@@ -16,4 +16,6 @@ public class ResultGuessDTO {
         private String wordContent;
         private String resultPattern;
         private List<PressedLetterDTO> pressedLetters;
+
+        private Long userId; 
 }

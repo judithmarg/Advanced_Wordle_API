@@ -3,12 +3,19 @@ package com.beproject.wordleapi.service;
 import com.beproject.wordleapi.domain.dto.ResultGuessDTO;
 import com.beproject.wordleapi.domain.dto.WordGuessDTO;
 import com.beproject.wordleapi.domain.entity.GameSession;
+import com.beproject.wordleapi.domain.entity.User;
 import com.beproject.wordleapi.repository.GameSessionRepository;
+import com.beproject.wordleapi.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 @Service
@@ -20,20 +27,33 @@ public class GameSessionServiceImpl implements GameSessionService {
     private final GuessHandler guessWordChain;
     private final GameSessionRepository  gameSessionRepository;
     private final Dictionary dictionary;
+    private final UserRepository userRepository;
 
     @Override
+    @Transactional
     public ResultGuessDTO guessWord(WordGuessDTO wordGuessDTO) {
+        User currentUser = getAuthenticatedUser();
 
-        String targetWord = getTargetWord(wordGuessDTO.playMode());
-        GameSession gameSession = startGame(targetWord,wordGuessDTO.playMode());
+        GameSession gameSession = startGame(wordGuessDTO.playMode(), currentUser);
+        
         ResultGuessDTO resultGuessDTO = new ResultGuessDTO();
+        resultGuessDTO.setUserId(currentUser.getId());
         String wordUppercase = wordGuessDTO.word().toUpperCase();
 
         return guessWordChain.handle(
-                wordUppercase, targetWord, null, gameSession, resultGuessDTO
+                wordUppercase, 
+                gameSession.getTargetWord(),
+                null, 
+                gameSession, 
+                resultGuessDTO
         );
     }
 
+    private User getAuthenticatedUser() {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado en sesión"));
+    }
 
     /**
      * This method obtains the word if the mode is random
@@ -47,7 +67,7 @@ public class GameSessionServiceImpl implements GameSessionService {
         if ("RANDOM".equals(mode)) {
             return dictionary.getRandomWord();
         }
-        throw new IllegalArgumentException("Invalid mode");
+        throw new IllegalArgumentException("Invalid mode" + mode);
     }
 
     /**
@@ -56,21 +76,38 @@ public class GameSessionServiceImpl implements GameSessionService {
      * @param playMode
      * @return GameSession for continue or start a game
      */
-    private GameSession startGame(String targetWord, String playMode) {
+    private GameSession startGame(String playMode, User user) {
+        
+        List<GameSession> activeSession = gameSessionRepository.findLastByModeAndStatus(
+                user.getId(), playMode, "IN_PROGRESS");
 
-        //here filtrar gameSession de un usuario del dia de hoy y luego lo de abajo
-        log.info("Juego iniciado en modo {}", playMode);
-        List<GameSession> lastSession = gameSessionRepository.findLastByModeAndStatus(playMode, "IN PROGRESS");
-
-        if (!lastSession.isEmpty()) {
-            return lastSession.get(0);
+        if (!activeSession.isEmpty()) {
+            log.info("Retomando sesión existente {} para {}", activeSession.get(0).getId(), user.getUsername());
+            return activeSession.get(0);
         }
 
+        if ("DAILY".equals(playMode)) {
+            LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
+            LocalDateTime endOfDay = LocalDate.now().atTime(LocalTime.MAX);
+
+            boolean alreadyPlayed = gameSessionRepository.hasUserFinishedDailyGameToday(
+                    user.getId(), startOfDay, endOfDay
+            );
+
+            if (alreadyPlayed) {
+                throw new IllegalArgumentException("Ya has jugado tu desafío diario de hoy. ¡Vuelve mañana!");
+            }
+        }
+
+        log.info("Creando nueva sesión para usuario {} en modo {}", user.getUsername(), playMode);
+        
         GameSession session = new GameSession();
         session.setMode(playMode);
-        session.setTargetWord(targetWord);
-        session.setStatus("IN PROGRESS");
-        gameSessionRepository.save(session);
-        return session;
+        session.setStatus("IN_PROGRESS");
+        session.setUser(user);
+
+        session.setTargetWord(getTargetWord(playMode)); 
+        
+        return gameSessionRepository.save(session);
     }
 }

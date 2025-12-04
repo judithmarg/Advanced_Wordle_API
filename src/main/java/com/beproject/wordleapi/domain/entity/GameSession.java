@@ -35,6 +35,10 @@ public class GameSession {
 
     private LocalDateTime completedAt;
 
+    @ManyToOne(fetch = FetchType.LAZY) 
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
     @OneToOne(mappedBy = "gameSession", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private DailyChallenge dailyChallenge;
 
