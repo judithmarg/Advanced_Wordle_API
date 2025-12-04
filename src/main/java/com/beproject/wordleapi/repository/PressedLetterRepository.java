@@ -13,8 +13,7 @@ import java.util.UUID;
 
 public interface PressedLetterRepository extends JpaRepository<PressedLetter, UUID> {
 
-//    List<PressedLetter> findByGameSessionId(@Param("gameSessionId") UUID gameSessionId);
-    List<PressedLetter> findByGameSessionId(UUID gameSessionId);
+    List<PressedLetter> findByGameSessionId(@Param("gameSessionId") UUID gameSessionId);
 
     Optional<PressedLetter> findByGameSessionIdAndLetter(UUID id, char letter);
 }
