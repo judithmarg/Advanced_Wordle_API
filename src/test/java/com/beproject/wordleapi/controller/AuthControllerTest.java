@@ -1,6 +1,5 @@
-package com.beproject.wordleapi.integration.controller;
+package com.beproject.wordleapi.controller;
 
-import com.beproject.wordleapi.controller.AuthController;
 import com.beproject.wordleapi.domain.dto.UserLoginDTO;
 import com.beproject.wordleapi.domain.dto.UserRegisterDTO;
 import com.beproject.wordleapi.domain.dto.UserResponseDTO;

@@ -1,4 +1,4 @@
-package com.beproject.wordleapi.integration.controller;
+package com.beproject.wordleapi.controller;
 
 import com.beproject.wordleapi.controller.WordOfTheDayController;
 import com.beproject.wordleapi.domain.dto.WordOfTheDayRequest;

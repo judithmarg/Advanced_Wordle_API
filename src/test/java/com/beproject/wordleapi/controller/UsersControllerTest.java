@@ -1,6 +1,5 @@
-package com.beproject.wordleapi.integration.controller;
+package com.beproject.wordleapi.controller;
 
-import com.beproject.wordleapi.controller.UsersController;
 import com.beproject.wordleapi.security.JwtAuthFilter;
 import com.beproject.wordleapi.service.JwtService;
 import com.beproject.wordleapi.service.UserService;
