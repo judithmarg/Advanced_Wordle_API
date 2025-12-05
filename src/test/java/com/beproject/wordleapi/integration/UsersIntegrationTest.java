@@ -13,6 +13,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -28,7 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-@Transactional 
+@Transactional
 class UsersIntegrationTest {
 
     @Autowired private MockMvc mockMvc;
@@ -38,7 +39,10 @@ class UsersIntegrationTest {
     @Autowired private PasswordEncoder passwordEncoder;
 
     @BeforeEach
-    void setupRoles() {
+    void setup() {
+
+        ReflectionTestUtils.setField(jwtService, "secretKey", "1234567890ABCDEF1234567890ABCDEF1234567890ABCDEF1234567890ABCDEF");
+
         if (roleRepository.findByName(ERole.ROLE_ADMIN).isEmpty()) {
             Role role = new Role();
             role.setName(ERole.ROLE_ADMIN);
@@ -67,8 +71,6 @@ class UsersIntegrationTest {
 
     @Test
     void shouldReturnForbiddenWhenPlayerRequests() throws Exception {
-        // Antes: shouldReturnForbidden_WhenPlayerRequests (con guion bajo)
-        // Ahora: CamelCase estricto
         User player = new User();
         player.setUsername("player");
         player.setEmail("player@test.com");
@@ -89,8 +91,6 @@ class UsersIntegrationTest {
 
     @Test
     void shouldReturnUnauthorizedWhenNoTokenProvided() throws Exception {
-        // Antes: shouldReturnUnauthorized_WhenNoTokenProvided
-        // Ahora: CamelCase estricto
         mockMvc.perform(get("/admin/users/emails"))
                 .andExpect(status().isUnauthorized());
     }

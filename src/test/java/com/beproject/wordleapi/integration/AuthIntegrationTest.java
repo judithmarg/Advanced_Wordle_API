@@ -6,6 +6,7 @@ import com.beproject.wordleapi.domain.entity.ERole;
 import com.beproject.wordleapi.domain.entity.Role;
 import com.beproject.wordleapi.repository.RoleRepository;
 import com.beproject.wordleapi.repository.UserRepository;
+import com.beproject.wordleapi.service.JwtService; 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,6 +15,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.util.ReflectionTestUtils; 
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -32,9 +34,12 @@ class AuthIntegrationTest {
     @Autowired private ObjectMapper objectMapper;
     @Autowired private UserRepository userRepository;
     @Autowired private RoleRepository roleRepository;
+    @Autowired private JwtService jwtService;
 
     @BeforeEach
-    void setupRoles() {
+    void setup() {
+        ReflectionTestUtils.setField(jwtService, "secretKey", "1234567890ABCDEF1234567890ABCDEF1234567890ABCDEF1234567890ABCDEF");
+
         if (roleRepository.findByName(ERole.ROLE_PLAYER).isEmpty()) {
             Role role = new Role();
             role.setName(ERole.ROLE_PLAYER);
