@@ -30,3 +30,13 @@ jobs:
         name: jacoco-report
         path: target/site/jacoco/
         retention-days: 5
+
+    - name: Deploy to Render (via deploy hook)
+      if: github.ref == 'refs/heads/main' && success()
+      env:
+        RENDER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+      run: |
+        echo "Triggering deploy on Render..."
+        curl -X POST "$RENDER_DEPLOY_HOOK_URL"
+        
+
