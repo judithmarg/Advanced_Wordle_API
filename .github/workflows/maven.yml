@@ -21,10 +21,16 @@ jobs:
         cache: maven
 
     - name: Build with Maven
-      run: mvn -B verify
+
+      env:
+        JWT_SECRET: "secreto_dummy_para_ci_testing_123456"
+        DATASOURCE_PGS: "jdbc:postgresql://localhost:5432/dummy"
+        DB_USERNAME: "dummy"
+        DB_PASSWORD: "dummy"
+      run: mvn -B clean verify -Dspring.profiles.active=test
 
     - name: Upload JaCoCo Report
-      if: always()
+      if: always() # Importante: Sube el reporte aunque fallen los tests
       uses: actions/upload-artifact@v4 
       with:
         name: jacoco-report
