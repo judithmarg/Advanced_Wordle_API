@@ -1,5 +1,6 @@
 package com.beproject.wordleapi.service;
 
+import com.beproject.wordleapi.domain.dto.RoleDTO;
 import com.beproject.wordleapi.domain.dto.UserRegisterDTO;
 import com.beproject.wordleapi.domain.dto.UserResponseDTO;
 import com.beproject.wordleapi.domain.entity.ERole;
@@ -15,6 +16,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -130,5 +132,37 @@ public class UserServiceTest {
         assertThrows(RuntimeException.class, () -> service.softDeleteUser(99L));
         
         verify(userRepository, never()).save(any());
+    }
+
+    @Test
+    void addRoleToUser_shouldNotSaveWhenUserAlreadyHasRole() {
+        Long userId = 1L;
+        RoleDTO roleDto = new RoleDTO(ERole.ROLE_PLAYER);
+
+        Role existingRole = new Role();
+        existingRole.setName(ERole.ROLE_PLAYER);
+
+        User user = new User();
+        user.setId(userId);
+        user.setActive(true);
+        user.setRoles(new HashSet<>(Set.of(existingRole)));
+
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(roleRepository.findByName(ERole.ROLE_PLAYER)).thenReturn(Optional.of(existingRole));
+
+        service.addRoleToUser(userId, roleDto);
+
+        verify(userRepository, never()).save(any());
+    }
+
+    @Test
+    void addRoleToUser_shouldThrowWhenUserNotFound() {
+        when(userRepository.findById(99L)).thenReturn(Optional.empty());
+
+        RoleDTO dto = new RoleDTO(ERole.ROLE_ADMIN);
+
+        assertThrows(RuntimeException.class, () ->
+                service.addRoleToUser(99L, dto)
+        );
     }
 }

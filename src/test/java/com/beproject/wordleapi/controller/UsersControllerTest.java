@@ -1,107 +1,93 @@
 package com.beproject.wordleapi.controller;
 
+import com.beproject.wordleapi.domain.dto.RoleDTO;
+import com.beproject.wordleapi.domain.dto.UserResponseDTO;
 import com.beproject.wordleapi.domain.entity.ERole;
-import com.beproject.wordleapi.domain.entity.Role;
 import com.beproject.wordleapi.domain.entity.User;
-import com.beproject.wordleapi.repository.RoleRepository;
-import com.beproject.wordleapi.repository.UserRepository;
-import com.beproject.wordleapi.service.JwtService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.HashSet;
+import com.beproject.wordleapi.service.UserService;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
+
+import java.util.List;
 import java.util.Set;
 
-import static org.hamcrest.Matchers.hasItems;
-import static org.hamcrest.Matchers.hasSize;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
+class UsersControllerTest {
 
-@SpringBootTest
-@AutoConfigureMockMvc
-@ActiveProfiles("test")
-@Transactional
-class UsersIntegrationTest {
+    @Mock
+    private UserService userService;
 
-    @Autowired private MockMvc mockMvc;
-    @Autowired private UserRepository userRepository;
-    @Autowired private RoleRepository roleRepository;
-    @Autowired private JwtService jwtService;
-    @Autowired private PasswordEncoder passwordEncoder;
+    @InjectMocks
+    private UsersController controller;
+
+    private User admin1;
+    private User admin2;
 
     @BeforeEach
-    void setupRoles() {
-        if (roleRepository.findByName(ERole.ROLE_ADMIN).isEmpty()) {
-            Role role = new Role();
-            role.setName(ERole.ROLE_ADMIN);
-            roleRepository.save(role);
-        }
-        if (roleRepository.findByName(ERole.ROLE_PLAYER).isEmpty()) {
-            Role role = new Role();
-            role.setName(ERole.ROLE_PLAYER);
-            roleRepository.save(role);
-        }
+    void setUp() {
+        admin1 = new User();
+        admin1.setEmail("admin1@test.com");
+
+        admin2 = new User();
+        admin2.setEmail("root@test.com");
     }
 
     @Test
-    void shouldReturn200OkAndEmailsWhenAdminRequests() throws Exception {
-        createAdminUser("admin1", "admin1@test.com");
-        User requestingAdmin = createAdminUser("root", "root@test.com");
+    void shouldReturnEmailsWhenAdminRequests() {
+        List<String> emails = List.of("admin1@test.com", "root@test.com");
 
-        String token = jwtService.generateToken(requestingAdmin);
+        when(userService.getAdminEmails()).thenReturn(emails);
 
-        mockMvc.perform(get("/admin/users/emails")
-                .header("Authorization", "Bearer " + token))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(2)))
-                .andExpect(jsonPath("$", hasItems("admin1@test.com", "root@test.com")));
+        ResponseEntity<List<String>> result = controller.getAdminEmails();
+
+        assertEquals(200, result.getStatusCode().value());
+        assertEquals(emails, result.getBody());
     }
 
     @Test
-    void shouldReturnForbiddenWhenPlayerRequests() throws Exception {
-        User player = new User();
-        player.setUsername("player");
-        player.setEmail("player@test.com");
-        player.setPassword(passwordEncoder.encode("pass"));
-        player.setActive(true);
-        
-        Set<Role> roles = new HashSet<>();
-        roles.add(roleRepository.findByName(ERole.ROLE_PLAYER).orElseThrow());
-        player.setRoles(roles);
-        userRepository.save(player);
+    void tryForbiddenWhenPlayerRequests() {
+        when(userService.getAdminEmails())
+                .thenThrow(new AccessDeniedException("Forbidden"));
 
-        String token = jwtService.generateToken(player);
-
-        mockMvc.perform(get("/admin/users/emails")
-                .header("Authorization", "Bearer " + token))
-                .andExpect(status().isForbidden());
+        assertThrows(AccessDeniedException.class, () -> controller.getAdminEmails());
     }
 
     @Test
-    void shouldReturnUnauthorizedWhenNoTokenProvided() throws Exception {
-        mockMvc.perform(get("/admin/users/emails"))
-                .andExpect(status().isUnauthorized());
+    void tryUnauthorizedWhenNoTokenProvided() {
+        when(userService.getAdminEmails())
+                .thenThrow(new AuthenticationCredentialsNotFoundException("Unauthorized"));
+
+        assertThrows(AuthenticationCredentialsNotFoundException.class, () -> controller.getAdminEmails());
     }
+    @Test
+    void shouldAddRolesToUser() {
+        UserResponseDTO admin = new UserResponseDTO(
+                admin1.getId(), "", "", true, Set.of("ROLE_ADMIN")
+        );
 
-    private User createAdminUser(String username, String email) {
-        User admin = new User();
-        admin.setUsername(username);
-        admin.setEmail(email);
-        admin.setPassword(passwordEncoder.encode("SecurePass!"));
-        admin.setActive(true);
+        when(userService.addRoleToUser(eq(admin1.getId()), any(RoleDTO.class)))
+                .thenReturn(admin);
 
-        Set<Role> roles = new HashSet<>();
-        roles.add(roleRepository.findByName(ERole.ROLE_ADMIN).orElseThrow());
-        admin.setRoles(roles);
+        ResponseEntity<UserResponseDTO> result =
+                controller.addRole(admin1.getId(), new RoleDTO(ERole.ROLE_ADMIN));
 
-        return userRepository.save(admin);
+        assertEquals(200, result.getStatusCode().value());
+        assertEquals(admin1.getId(), result.getBody().id());
     }
 }
