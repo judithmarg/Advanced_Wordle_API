@@ -27,7 +27,7 @@ jobs:
         DATASOURCE_PGS: "jdbc:postgresql://localhost:5432/dummy"
         DB_USERNAME: "dummy"
         DB_PASSWORD: "dummy"
-      run: mvn -B verify
+      run: mvn -B clean verify -Dspring.profiles.active=test
 
     - name: Upload JaCoCo Report
       if: always() # Importante: Sube el reporte aunque fallen los tests
