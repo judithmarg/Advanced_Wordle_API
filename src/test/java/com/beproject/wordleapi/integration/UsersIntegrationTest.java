@@ -11,6 +11,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration; 
+import org.springframework.context.annotation.Bean; 
+import org.springframework.context.annotation.Primary; 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -38,11 +41,19 @@ class UsersIntegrationTest {
     @Autowired private JwtService jwtService;
     @Autowired private PasswordEncoder passwordEncoder;
 
+    @TestConfiguration
+    static class TestConfig {
+        @Bean
+        @Primary 
+        public JwtService jwtService() {
+            JwtService service = new JwtService();
+            ReflectionTestUtils.setField(service, "secretKey", "1234567890ABCDEF1234567890ABCDEF1234567890ABCDEF1234567890ABCDEF");
+            return service;
+        }
+    }
+
     @BeforeEach
-    void setup() {
-
-        ReflectionTestUtils.setField(jwtService, "secretKey", "1234567890ABCDEF1234567890ABCDEF1234567890ABCDEF1234567890ABCDEF");
-
+    void setupRoles() {
         if (roleRepository.findByName(ERole.ROLE_ADMIN).isEmpty()) {
             Role role = new Role();
             role.setName(ERole.ROLE_ADMIN);
