@@ -52,7 +52,7 @@ class UsersIntegrationTest {
     }
 
     @Test
-    void shouldReturn200OkAndEmails_WhenAdminRequests() throws Exception {
+    void shouldReturn200OkAndEmailsWhenAdminRequests() throws Exception {
         createAdminUser("admin1", "admin1@test.com");
         User requestingAdmin = createAdminUser("root", "root@test.com");
 
@@ -61,12 +61,14 @@ class UsersIntegrationTest {
         mockMvc.perform(get("/admin/users/emails")
                 .header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(2))) // Esperamos 2 emails
+                .andExpect(jsonPath("$", hasSize(2)))
                 .andExpect(jsonPath("$", hasItems("admin1@test.com", "root@test.com")));
     }
 
     @Test
-    void shouldReturnForbidden_WhenPlayerRequests() throws Exception {
+    void shouldReturnForbiddenWhenPlayerRequests() throws Exception {
+        // Antes: shouldReturnForbidden_WhenPlayerRequests (con guion bajo)
+        // Ahora: CamelCase estricto
         User player = new User();
         player.setUsername("player");
         player.setEmail("player@test.com");
@@ -86,7 +88,9 @@ class UsersIntegrationTest {
     }
 
     @Test
-    void shouldReturnUnauthorized_WhenNoTokenProvided() throws Exception {
+    void shouldReturnUnauthorizedWhenNoTokenProvided() throws Exception {
+        // Antes: shouldReturnUnauthorized_WhenNoTokenProvided
+        // Ahora: CamelCase estricto
         mockMvc.perform(get("/admin/users/emails"))
                 .andExpect(status().isUnauthorized());
     }
