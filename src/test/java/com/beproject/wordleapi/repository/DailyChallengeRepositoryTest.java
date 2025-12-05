@@ -28,7 +28,7 @@ class DailyChallengeRepositoryTest {
     private TestEntityManager entityManager;
 
     @Test
-    void findByDailyPlay_ShouldReturnChallenge_WhenSessionIdMatches() {
+    void findByDailyPlayShouldReturnChallengeWhenSessionIdMatches() {
 
         User user = new User();
         user.setUsername("dailyPlayer");
@@ -64,7 +64,7 @@ class DailyChallengeRepositoryTest {
     }
 
     @Test
-    void findByDailyPlay_ShouldReturnNull_WhenSessionIdDoesNotExist() {
+    void findByDailyPlayShouldReturnNullWhenSessionIdDoesNotExist() {
 
         UUID randomId = UUID.randomUUID();
 
@@ -74,7 +74,7 @@ class DailyChallengeRepositoryTest {
     }
 
     @Test
-    void existsByGameSession_ShouldReturnTrue_WhenChallengeExists() {
+    void existsByGameSessionShouldReturnTrueWhenChallengeExists() {
         User user = new User();
         user.setUsername("existsPlayer");
         user.setEmail("exists@test.com");
@@ -106,7 +106,7 @@ class DailyChallengeRepositoryTest {
     }
 
     @Test
-    void existsByGameSession_ShouldReturnFalse_WhenChallengeDoesNotExist() {
+    void existsByGameSessionShouldReturnFalseWhenChallengeDoesNotExist() {
 
         User user = new User();
         user.setUsername("noChallengePlayer");
