@@ -1,5 +1,6 @@
 package com.beproject.wordleapi.service;
 
+import com.beproject.wordleapi.domain.dto.RoleDTO;
 import com.beproject.wordleapi.domain.dto.UserRegisterDTO;
 import com.beproject.wordleapi.domain.dto.UserResponseDTO;
 import com.beproject.wordleapi.domain.entity.ERole;
@@ -94,4 +95,27 @@ public class UserService {
             () -> { throw new RuntimeException("User not found"); }
         );
     }
+
+    @Transactional
+    public UserResponseDTO addRoleToUser(Long userId, RoleDTO roleToAdd) {
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        Role role = roleRepository.findByName(roleToAdd.role())
+                .orElseThrow(() -> new RuntimeException("Role not found"));
+
+        if (user.getRoles().contains(role)) {
+            log.warn("El usuario {} ya tiene el rol {}", user.getUsername(), roleToAdd);
+            return userMapper.toDto(user);
+        }
+
+        user.getRoles().add(role);
+        User updated = userRepository.save(user);
+
+        log.info("Rol {} asignado al usuario {}", roleToAdd, updated.getUsername());
+
+        return userMapper.toDto(updated);
+    }
+
 }
