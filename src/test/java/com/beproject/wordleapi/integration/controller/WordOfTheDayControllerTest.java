@@ -1,5 +1,6 @@
-package com.beproject.wordleapi.controller;
+package com.beproject.wordleapi.integration.controller;
 
+import com.beproject.wordleapi.controller.WordOfTheDayController;
 import com.beproject.wordleapi.domain.dto.WordOfTheDayRequest;
 import com.beproject.wordleapi.domain.dto.WordOfTheDayResponse;
 import com.beproject.wordleapi.security.JwtAuthFilter;
