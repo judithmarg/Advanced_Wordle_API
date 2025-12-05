@@ -6,19 +6,14 @@ import com.beproject.wordleapi.domain.entity.ERole;
 import com.beproject.wordleapi.domain.entity.Role;
 import com.beproject.wordleapi.repository.RoleRepository;
 import com.beproject.wordleapi.repository.UserRepository;
-import com.beproject.wordleapi.service.JwtService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration; // <--- NUEVO
-import org.springframework.context.annotation.Bean; // <--- NUEVO
-import org.springframework.context.annotation.Primary; // <--- NUEVO
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -37,18 +32,6 @@ class AuthIntegrationTest {
     @Autowired private ObjectMapper objectMapper;
     @Autowired private UserRepository userRepository;
     @Autowired private RoleRepository roleRepository;
-    @Autowired private JwtService jwtService;
-
-    @TestConfiguration
-    static class TestConfig {
-        @Bean
-        @Primary
-        public JwtService jwtService() {
-            JwtService service = new JwtService();
-            ReflectionTestUtils.setField(service, "secretKey", "1234567890ABCDEF1234567890ABCDEF1234567890ABCDEF1234567890ABCDEF");
-            return service;
-        }
-    }
 
     @BeforeEach
     void setupRoles() {

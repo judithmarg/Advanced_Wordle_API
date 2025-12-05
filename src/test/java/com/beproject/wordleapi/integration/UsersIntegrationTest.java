@@ -11,12 +11,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration; 
-import org.springframework.context.annotation.Bean; 
-import org.springframework.context.annotation.Primary; 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -32,7 +28,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-@Transactional
+@Transactional 
 class UsersIntegrationTest {
 
     @Autowired private MockMvc mockMvc;
@@ -40,17 +36,6 @@ class UsersIntegrationTest {
     @Autowired private RoleRepository roleRepository;
     @Autowired private JwtService jwtService;
     @Autowired private PasswordEncoder passwordEncoder;
-
-    @TestConfiguration
-    static class TestConfig {
-        @Bean
-        @Primary 
-        public JwtService jwtService() {
-            JwtService service = new JwtService();
-            ReflectionTestUtils.setField(service, "secretKey", "1234567890ABCDEF1234567890ABCDEF1234567890ABCDEF1234567890ABCDEF");
-            return service;
-        }
-    }
 
     @BeforeEach
     void setupRoles() {
@@ -82,6 +67,7 @@ class UsersIntegrationTest {
 
     @Test
     void shouldReturnForbiddenWhenPlayerRequests() throws Exception {
+        
         User player = new User();
         player.setUsername("player");
         player.setEmail("player@test.com");
@@ -102,6 +88,7 @@ class UsersIntegrationTest {
 
     @Test
     void shouldReturnUnauthorizedWhenNoTokenProvided() throws Exception {
+
         mockMvc.perform(get("/admin/users/emails"))
                 .andExpect(status().isUnauthorized());
     }
